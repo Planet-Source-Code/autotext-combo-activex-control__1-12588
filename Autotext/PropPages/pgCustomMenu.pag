@@ -1,0 +1,301 @@
+VERSION 5.00
+Object = "{CDE57A40-8B86-11D0-B3C6-00A0C90AEA82}#1.0#0"; "MSDATGRD.OCX"
+Begin VB.PropertyPage pgCustomMenu 
+   AutoRedraw      =   -1  'True
+   Caption         =   "Custom Popup Menu Edit"
+   ClientHeight    =   3870
+   ClientLeft      =   0
+   ClientTop       =   0
+   ClientWidth     =   4950
+   ClipControls    =   0   'False
+   PaletteMode     =   0  'Halftone
+   ScaleHeight     =   3870
+   ScaleWidth      =   4950
+   Begin VB.TextBox txtCustomMenu 
+      Height          =   330
+      Left            =   3555
+      TabIndex        =   2
+      Top             =   555
+      Visible         =   0   'False
+      Width           =   900
+   End
+   Begin VB.CheckBox chkAllowContextMenu 
+      Caption         =   "AllowContextMenu"
+      Height          =   285
+      Left            =   720
+      TabIndex        =   1
+      Top             =   315
+      Width           =   2700
+   End
+   Begin MSDataGridLib.DataGrid grdMenus 
+      Height          =   2580
+      Left            =   720
+      TabIndex        =   0
+      Top             =   990
+      Width           =   3435
+      _ExtentX        =   6059
+      _ExtentY        =   4551
+      _Version        =   393216
+      AllowUpdate     =   -1  'True
+      AllowArrows     =   -1  'True
+      HeadLines       =   1
+      RowHeight       =   15
+      TabAction       =   1
+      WrapCellPointer =   -1  'True
+      AllowAddNew     =   -1  'True
+      AllowDelete     =   -1  'True
+      BeginProperty HeadFont {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ColumnCount     =   2
+      BeginProperty Column00 
+         DataField       =   ""
+         Caption         =   ""
+         BeginProperty DataFormat {6D835690-900B-11D0-9484-00A0C91110ED} 
+            Type            =   0
+            Format          =   ""
+            HaveTrueFalseNull=   0
+            FirstDayOfWeek  =   0
+            FirstWeekOfYear =   0
+            LCID            =   1033
+            SubFormatType   =   0
+         EndProperty
+      EndProperty
+      BeginProperty Column01 
+         DataField       =   ""
+         Caption         =   ""
+         BeginProperty DataFormat {6D835690-900B-11D0-9484-00A0C91110ED} 
+            Type            =   0
+            Format          =   ""
+            HaveTrueFalseNull=   0
+            FirstDayOfWeek  =   0
+            FirstWeekOfYear =   0
+            LCID            =   1033
+            SubFormatType   =   0
+         EndProperty
+      EndProperty
+      SplitCount      =   1
+      BeginProperty Split0 
+         BeginProperty Column00 
+         EndProperty
+         BeginProperty Column01 
+         EndProperty
+      EndProperty
+   End
+   Begin VB.Label lblCustomMenu 
+      Caption         =   "Custom Menu Entries:"
+      Height          =   240
+      Left            =   720
+      TabIndex        =   3
+      Top             =   675
+      Width           =   2700
+   End
+End
+Attribute VB_Name = "pgCustomMenu"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = True
+Option Explicit
+   Private rs        As ADODB.Recordset
+   Private IsBusy    As Boolean
+   
+Private Sub grdMenus_AfterColUpdate(ByVal ColIndex As Integer)
+   If Not IsBusy Then Changed = True
+End Sub
+
+Private Sub grdMenus_AfterDelete()
+   Changed = True
+End Sub
+
+Private Sub grdMenus_AfterUpdate()
+   If Not IsBusy Then Changed = True
+End Sub
+
+Private Sub grdMenus_BeforeUpdate(Cancel As Integer)
+   If grdMenus.Columns(0).Value & "" = "" Then
+      grdMenus.Columns(0).Value = rs.RecordCount
+   End If
+End Sub
+
+Private Sub grdMenus_KeyPress(KeyAscii As Integer)
+   If Len(grdMenus.Columns(1).Value) >= 31 Then
+      KeyAscii = 0
+      Beep
+   End If
+End Sub
+
+Private Sub PropertyPage_Initialize()
+   Dim fld As ADODB.Field
+   
+On Error GoTo ErrorHandler
+   IsBusy = True
+   Set rs = New ADODB.Recordset
+   With rs
+      With .Fields
+         .Append "Index", adSmallInt, 2, adFldKeyColumn
+         .Append "MenuName", adVarChar, 30, adFldUpdatable
+         .Refresh
+      End With
+      .CursorLocation = adUseClient
+      .CursorType = adOpenStatic
+      .Open
+   End With
+   
+   With grdMenus
+      Set .DataSource = rs
+      .ReBind
+      With .Columns(0)
+         .Visible = False
+         .AllowSizing = False
+         .DataField = "Index"
+      End With
+      
+      With .Columns(1)
+         .Caption = "Menu Entry Name"
+         .Visible = True
+         .AllowSizing = True
+         .DataField = "MenuName"
+         .Width = grdMenus.Width - 650
+      End With
+      .HoldFields
+      
+   End With
+   grdMenus.Visible = False
+   grdMenus.Visible = True
+   PropertyPage.Refresh
+   IsBusy = False
+   Exit Sub
+ErrorHandler:
+   Err.Clear
+End Sub
+
+Private Sub txtCustomMenu_Change()
+   If Not IsBusy Then Changed = True
+End Sub
+
+Private Sub chkAllowContextMenu_Click()
+   If Not IsBusy Then Changed = True
+End Sub
+
+Private Sub PropertyPage_ApplyChanges()
+   Dim a    As Variant
+   Dim i    As Long
+   
+On Error GoTo ErrorHandler
+   IsBusy = True
+   If Not rs Is Nothing Then
+      If rs.RecordCount > 0 Then
+         rs.MoveFirst
+         ReDim a(0 To rs.RecordCount - 1)
+         For i = 0 To rs.RecordCount - 1
+            a(i) = rs(1).Value
+            rs.MoveNext
+         Next i
+         txtCustomMenu.Text = Join(a, "~")
+      Else
+         txtCustomMenu.Text = ""
+      End If
+   Else
+      txtCustomMenu.Text = ""
+   End If
+   SelectedControls(0).CustomMenu = txtCustomMenu.Text
+   SelectedControls(0).AllowContextMenu = (chkAllowContextMenu.Value = vbChecked)
+   grdMenus.Visible = False
+   grdMenus.Visible = True
+   PropertyPage.Refresh
+   IsBusy = False
+   Exit Sub
+ErrorHandler:
+   Err.Clear
+End Sub
+
+Private Sub PropertyPage_SelectionChanged()
+   Dim a       As Variant
+   Dim i       As Integer
+   
+On Error GoTo ErrorHandler
+   IsBusy = True
+   txtCustomMenu.Text = SelectedControls(0).CustomMenu
+   
+   If rs.RecordCount <> 0 Then rs.MoveFirst
+   Do Until rs.RecordCount = 0
+      rs.Delete
+      If rs.RecordCount <> 0 Then rs.MoveFirst
+   Loop
+   
+   If txtCustomMenu.Text <> "" Then
+      a = Split(txtCustomMenu.Text, "~")
+      For i = LBound(a) To UBound(a)
+         With rs
+            .AddNew
+            !Index = i
+            !MenuName = a(i)
+            .UpdateBatch adAffectAllChapters
+         End With
+      Next i
+   End If
+   
+   chkAllowContextMenu.Value = (SelectedControls(0).AllowContextMenu And vbChecked)
+   If rs.RecordCount <> 0 Then rs.MoveFirst
+   grdMenus.Visible = False
+   grdMenus.Visible = True
+   PropertyPage.Refresh
+   IsBusy = False
+   Exit Sub
+ErrorHandler:
+   Err.Clear
+End Sub
+
+Private Sub Draw3dBorder()
+   Dim intSaveScaleMode       As Integer
+   Dim intLineWidth           As Integer
+   Dim intScaleWidth          As Integer
+   Dim intScaleHeight         As Integer
+   Dim intCircleWidth         As Integer
+   
+   Const cPi                  As Single = 3.1415926
+   
+   intLineWidth = 9
+   intSaveScaleMode = ScaleMode    'save scale mode
+   ScaleMode = vbPixels '3
+
+   intScaleWidth = ScaleWidth
+   intScaleHeight = ScaleHeight     'clear form
+   
+   Cls
+
+' Draw the white lines.
+   Line (0, intScaleHeight)-(intLineWidth, 0), &HFFFFFF, BF
+   Line (0, intLineWidth)-(intScaleWidth, 0), &HFFFFFF, BF
+' Draw grey lines.
+   Line (intScaleWidth, 0)-(intScaleWidth - intLineWidth, intScaleHeight), &H808080, BF
+   Line (intScaleWidth, intScaleHeight - intLineWidth)-(0, intScaleHeight), &H808080, BF    'draw triangles(actually circles) at corners
+
+   intCircleWidth = Sqr(intLineWidth * intLineWidth + intLineWidth * intLineWidth)
+   FillStyle = 0
+   FillColor = QBColor(15)
+   Circle (intLineWidth, intScaleHeight - intLineWidth), intCircleWidth, QBColor(15), -3.1415926, -3.90953745777778 '-180 * cPi / 180, -224 * cPi / 180
+   Circle (intScaleWidth - intLineWidth, intLineWidth), intCircleWidth, QBColor(15), -0.78539815, -1.5707963 ' -45 * cPi / 180, -90 * cPi / 180    'draw black frapgCustomMenu
+   Line (0, intScaleHeight)-(0, 0), 0
+   Line (0, 0)-(intScaleWidth - 1, 0), 0
+   Line (intScaleWidth - 1, 0)-(intScaleWidth - 1, intScaleHeight - 1), 0
+   Line (0, intScaleHeight - 1)-(intScaleWidth - 1, intScaleHeight - 1), 0    'restore scale mode
+   ScaleMode = intSaveScaleMode
+   PropertyPage.Refresh
+End Sub

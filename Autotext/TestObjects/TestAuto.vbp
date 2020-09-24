@@ -1,0 +1,34 @@
+Type=Exe
+Form=frmTestAuto.frm
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\WINNT\SYSTEM32\STDOLE2.TLB#OLE Automation
+Object={0D2B9414-776D-11D4-84A4-0004AC39C2FC}#1.0#0; autotext.ocx
+IconForm="frmTestAuto"
+Startup="frmTestAuto"
+Command32=""
+Name="TestAuto"
+HelpContextID="0"
+CompatibleMode="0"
+MajorVer=1
+MinorVer=0
+RevisionVer=0
+AutoIncrementVer=0
+ServerSupportFiles=0
+VersionCompanyName="Allstate Insurance Co."
+CompilationType=0
+OptimizationType=0
+FavorPentiumPro(tm)=0
+CodeViewDebugInfo=0
+NoAliasing=0
+BoundsCheck=0
+OverflowCheck=0
+FlPointCheck=0
+FDIVCheck=0
+UnroundedFP=0
+StartMode=0
+Unattended=0
+Retained=0
+ThreadPerObject=0
+MaxNumberOfThreads=1
+
+[MS Transaction Server]
+AutoRefresh=1

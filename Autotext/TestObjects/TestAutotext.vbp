@@ -1,0 +1,34 @@
+Type=Exe
+Form=frmTestAutoText.frm
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#E:\WINNT\System32\stdole2.tlb#OLE Automation
+Object={49A45244-C3B7-40BF-A91E-FF1306814D71}#1.0#0; autotext.ocx
+IconForm="frmTestAutoText"
+Startup="frmTestAutoText"
+Command32=""
+Name="TestAutotext"
+HelpContextID="0"
+CompatibleMode="0"
+MajorVer=1
+MinorVer=0
+RevisionVer=0
+AutoIncrementVer=0
+ServerSupportFiles=0
+VersionCompanyName="Unlimited Software Solutions"
+CompilationType=0
+OptimizationType=0
+FavorPentiumPro(tm)=0
+CodeViewDebugInfo=0
+NoAliasing=0
+BoundsCheck=0
+OverflowCheck=0
+FlPointCheck=0
+FDIVCheck=0
+UnroundedFP=0
+StartMode=0
+Unattended=0
+Retained=0
+ThreadPerObject=0
+MaxNumberOfThreads=1
+
+[MS Transaction Server]
+AutoRefresh=1
